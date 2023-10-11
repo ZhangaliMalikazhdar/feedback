@@ -1,0 +1,82 @@
+{# contact.html #}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact us</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" crossorigin="anonymous">
+
+</head>
+
+<body>
+<header>
+  <h1 class="text-center mt-3">Feedbacks</h1>
+  <div class="ml-4 container row">
+    <form method="POST" action="{% url 'sort_by_email' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-info">sort by email</button>
+    </form>
+
+      <form method="POST" action="{% url 'sort_by_name' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-info ml-2">sort by name</button>
+    </form>
+
+      <form method="POST" action="{% url 'sort_by_date' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-info ml-2">sort by date</button>
+    </form>
+
+  </div>
+</header>
+<div>
+  {% for feedback in feedbacks %}
+  <ul id="text_result" class="list-group">
+    <li class="list-group-item"><b>{{ feedback.name }} -- {{ feedback.email }}</b>
+      <br>{{ feedback.text }}<br>
+<!--      <img src="{% feedback.image %"}}>-->
+    </li>
+  </ul>
+  {% endfor %}
+</div>
+
+<div class="container mt-5 w-50">
+  <form id="submitForm" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" name="contact-submit" class="btn btn-success btn-lg" />
+  </form>
+</div>
+{% block javascript %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+      $(document).ready(function () {
+          $('#submitForm').submit(function () {
+              $.ajax({
+                  data: $(this).serialize(),
+                  type: $(this).attr('method'),
+                  url: "{% url 'submit_form' %}",
+                  success: function (response) {
+                      alert("Спасибо, что оставили отзыв к нам " + response.name);
+                  },
+
+                  error: function (response) {
+                      alert(response.responseJSON.errors);
+                      console.log(response.responseJSON.errors)
+                  }
+              });
+              return false;
+          });
+
+      });
+
+
+
+  </script>
+{% endblock javascript %}
+</body>
+</html>
